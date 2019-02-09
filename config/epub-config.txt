@@ -1,0 +1,12 @@
+---
+title:
+- type: main
+  text: {{ .Title }}
+- type: subtitle
+  text: {{ .Subtitle }}
+creator:
+- role: author
+  text: Friends of Go
+- role: editor
+  text: Friends of Go
+date: {{ .CreationDate }}
