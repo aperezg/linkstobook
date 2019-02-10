@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/friendsofgo/epubmd/converter"
@@ -29,28 +28,26 @@ var convertCmd = &cobra.Command{
 	Short: "Convert output (html|markdown) into a epub file",
 	Run: func(cmd *cobra.Command, args []string) {
 		f, _ := cmd.Flags().GetString("format")
-		c, err := converter.NewConverter(f)
+		outputDir, _ := cmd.Flags().GetString("output")
+		webFiles, _ := cmd.Flags().GetStringSlice("web")
+
+		c, err := converter.NewConverter(f,
+			converter.WithOutputDir(outputDir),
+			converter.WithWebFiles(webFiles),
+		)
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = c.Convert([]string{})
-		fmt.Println(err)
+		if err = c.Convert(); err != nil {
+			log.Fatal(err)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(convertCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// convertCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// convertCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	convertCmd.Flags().StringP("format", "f", "epub", "Output format file")
-	convertCmd.Flags().StringP("output", "o", "", "Output path file")
-	convertCmd.Flags().StringSlice("web", []string{}, "external html files to convert into epub")
+	convertCmd.Flags().StringP("output", "o", "", "Output dir where tar.gz will be saved")
+	convertCmd.Flags().StringSlice("web", []string{}, "external html files to convert into epub (comma separated)")
 }

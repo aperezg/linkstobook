@@ -4,6 +4,7 @@ import (
 	"context"
 	"io/ioutil"
 	"log"
+	"time"
 
 	docker "docker.io/go-docker"
 	"docker.io/go-docker/api/types"
@@ -13,10 +14,19 @@ import (
 
 type pandoc struct {
 	cli *docker.Client
+
+	outputDir string
+	webFiles  []string
 }
 
 const (
 	dockerPandocImage = "jagregory/pandoc"
+)
+
+var (
+	currentTime       = time.Now()
+	outputPandocEpub  = "/source/fogo_pandoc_" + currentTime.Format("20060102150405") + ".epub"
+	outputTarFileName = "fogo_generated_epub_" + currentTime.Format("20060102150405") + ".tar.gz"
 )
 
 // NewPandocConverter a converter based on pandoc application
@@ -29,9 +39,23 @@ func NewPandocConverter() (Converter, error) {
 	return &pandoc{cli: cli}, nil
 }
 
-func (p *pandoc) Convert(opts ...[]string) error {
+func (p *pandoc) WithOutputDir(outputDir string) error {
+	p.outputDir = outputDir
+	return nil
+}
 
-	cmd := []string{"-s", "-r", "html", "https://go.googlesource.com/proposal/+/master/design/go2draft-contracts.md", "-o", "/source/test.epub"}
+func (p *pandoc) WithWebFiles(webFiles []string) error {
+	if len(webFiles) == 0 {
+		return errors.New("you must specify almost one file")
+	}
+	p.webFiles = webFiles
+	return nil
+}
+
+func (p *pandoc) Convert() error {
+
+	cmd := []string{"-o", outputPandocEpub, "-s", "-r", "html"}
+	cmd = append(cmd, p.webFiles...)
 
 	c, err := p.cli.ContainerCreate(
 		context.Background(),
@@ -64,9 +88,9 @@ func (p *pandoc) Convert(opts ...[]string) error {
 }
 
 func (p *pandoc) saveOutputFile(containerID string) error {
-	archive, _, err := p.cli.CopyFromContainer(context.Background(), containerID, "/source/test.epub")
+	archive, _, err := p.cli.CopyFromContainer(context.Background(), containerID, outputPandocEpub)
 	if err != nil {
-		return errors.Wrapf(err, "final file %s is not created", "test.epub")
+		return errors.Wrapf(err, "final file %s is not created", outputPandocEpub)
 	}
 
 	content, err := ioutil.ReadAll(archive)
@@ -74,7 +98,7 @@ func (p *pandoc) saveOutputFile(containerID string) error {
 		return errors.Wrap(err, "the output file can not be created")
 	}
 
-	ioutil.WriteFile("test.tar.gz", content, 0644)
+	ioutil.WriteFile(p.outputDir+outputTarFileName, content, 0644)
 	return nil
 }
 
@@ -101,6 +125,7 @@ func (p *pandoc) removeContainer(containerID string) error {
 	if err := p.cli.ContainerRemove(
 		context.Background(),
 		containerID, types.ContainerRemoveOptions{}); err != nil {
+
 		err := errors.Wrapf(err, "error trying to remove the container %s", containerID)
 		log.Println(err)
 	}
