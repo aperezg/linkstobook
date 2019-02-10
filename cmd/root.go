@@ -25,8 +25,8 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "epubmd",
-	Short: "A simple tool to convert markdown or html into epub",
+	Use:   "linkstobook",
+	Short: "A simple tool to convert web pages into epub",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },

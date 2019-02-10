@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/friendsofgo/epubmd/cmd"
+import "github.com/aperezg/linkstobook/cmd"
 
 func main() {
 	cmd.Execute()
