@@ -1,7 +1,7 @@
 # Links to Book
-It's a sample tool with unique motive to use [go-docker](docker.io/go-docker)
+It's a sample tool with unique motive to use [go-docker](https://docker.io/go-docker)
 
-I created this tool for learn how to work [go-docker](docker.io/go-docker) library and I used the [pandoc docker image](https://github.com/jagregory/pandoc-docker) to convert web pages into an epub.
+I created this tool for learn how to work [go-docker](https://docker.io/go-docker) library and I used the [pandoc docker image](https://github.com/jagregory/pandoc-docker) to convert web pages into an epub.
 
 I highly recommend that you use better the pandoc tool instead of my library for this purpose.
 
