@@ -6,7 +6,7 @@ import (
 
 // Converter is an interface to allow convert into files different formats
 type Converter interface {
-	Convert(opts ...[]string)
+	Convert(opts ...[]string) error
 }
 
 // ConverterFormat output format type supported by the application

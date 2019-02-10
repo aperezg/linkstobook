@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/friendsofgo/epubmd/converter"
@@ -32,7 +33,8 @@ var convertCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		c.Convert([]string{})
+		err = c.Convert([]string{})
+		fmt.Println(err)
 	},
 }
 
@@ -49,4 +51,6 @@ func init() {
 	// is called directly, e.g.:
 	// convertCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	convertCmd.Flags().StringP("format", "f", "epub", "Output format file")
+	convertCmd.Flags().StringP("output", "o", "", "Output path file")
+	convertCmd.Flags().StringSlice("web", []string{}, "external html files to convert into epub")
 }
